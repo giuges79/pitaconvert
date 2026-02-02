@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pitaconvert-v1';
+const CACHE_NAME = 'pitaconvert-v2';
 const ASSETS = [
   'index.html',
   'manifest.json',
