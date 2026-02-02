@@ -1,0 +1,17 @@
+{
+"name": "PitaConvert - Prof. Gesualdi",
+"short_name": "PitaConvert",
+"description": "Convertitore di grandezze fisiche per scopi didattici.",
+"start_url": "index.html",
+"display": "standalone",
+"background_color": "#f0f9ff",
+"theme_color": "#00BFFF",
+"icons": [
+{
+"src": "einstein512.png",
+"sizes": "512x512",
+"type": "image/png",
+"purpose": "any maskable"
+}
+]
+}

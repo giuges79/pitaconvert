@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PitaConvert - Prof. Giuseppe Gesualdi</title>
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#00BFFF">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/1055/1055644.png">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Quicksand:wght@500;700&display=swap');
+        
+        :root {
+            --cartoon-orange: #FF8C00;
+            --cartoon-blue: #00BFFF;
+            --cartoon-dark-blue: #1E90FF;
+            --cartoon-border: #2D3436;
+        }
+
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background-color: #f0f9ff;
+            background-image: radial-gradient(#00bfff22 2px, transparent 2px);
+            background-size: 30px 30px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .cartoon-card {
+            background: white;
+            border: 4px solid var(--cartoon-border);
+            border-radius: 30px;
+            box-shadow: 10px 10px 0px var(--cartoon-border);
+            overflow: hidden;
+            width: 100%;
+            max-width: 750px;
+        }
+
+        .header-banner {
+            background-color: var(--cartoon-blue);
+            border-bottom: 4px solid var(--cartoon-border);
+            padding: 1.5rem 1rem;
+        }
+
+        h1 {
+            font-family: 'Fredoka One', cursive;
+            color: white;
+            text-shadow: 3px 3px 0px var(--cartoon-border);
+            -webkit-text-stroke: 1px var(--cartoon-border);
+        }
+
+        .prof-tag {
+            background: var(--cartoon-orange);
+            color: white;
+            padding: 4px 15px;
+            border-radius: 50px;
+            border: 2px solid var(--cartoon-border);
+            font-weight: bold;
+            display: inline-block;
+            margin-top: 5px;
+            box-shadow: 2px 2px 0px var(--cartoon-border);
+            font-size: 0.9rem;
+        }
+
+        .cartoon-select, .cartoon-input {
+            border: 3px solid var(--cartoon-border);
+            border-radius: 12px;
+            padding: 12px;
+            font-weight: 700;
+            outline: none;
+            background: white;
+            width: 100%;
+        }
+
+        .section-label {
+            color: var(--cartoon-border);
+            font-weight: 900;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .category-btn {
+            background: #eee;
+            border: 2px solid var(--cartoon-border);
+            border-radius: 12px;
+            padding: 10px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .category-btn.active {
+            background: var(--cartoon-orange);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 0 var(--cartoon-border);
+        }
+
+        .btn-convert {
+            background-color: var(--cartoon-orange);
+            color: white;
+            border: 3px solid var(--cartoon-border);
+            border-radius: 15px;
+            font-family: 'Fredoka One', cursive;
+            font-size: 1.4rem;
+            box-shadow: 0 5px 0 var(--cartoon-border);
+            transition: all 0.1s;
+        }
+
+        .btn-convert:active {
+            box-shadow: 0 1px 0 var(--cartoon-border);
+            transform: translateY(4px);
+        }
+
+        .result-box {
+            background: #FFF3E0;
+            border: 4px dashed var(--cartoon-border);
+            border-radius: 20px;
+        }
+
+        .label-style {
+            color: var(--cartoon-dark-blue);
+            font-weight: 800;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            margin-bottom: 4px;
+            display: block;
+        }
+
+        .derived-container {
+            border-top: 2px dashed #ccc;
+            padding-top: 15px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body class="p-4">
+
+    <div class="cartoon-card">
+        <div class="header-banner text-center">
+            <h1 class="text-4xl">PitaConvert</h1>
+            <div class="prof-tag">Prof. Giuseppe Gesualdi</div>
+        </div>
+
+        <div class="p-6 space-y-6">
+            <!-- Grandezze Fondamentali (SI) -->
+            <div>
+                <span class="section-label">🌟 7 Grandezze Fondamentali (S.I.)</span>
+                <div id="baseCategoryContainer" class="category-grid"></div>
+            </div>
+
+            <!-- Grandezze Derivate -->
+            <div class="derived-container">
+                <span class="section-label">⚡ Grandezze Derivate & Altre</span>
+                <select id="derivedCategorySelector" class="cartoon-select text-orange-600" onchange="selectDerived(this.value)">
+                    <option value="" disabled selected>Scegli una grandezza derivata...</option>
+                </select>
+            </div>
+
+            <!-- Area Conversione -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t-2 border-gray-100">
+                <div class="md:col-span-1">
+                    <label class="label-style">Valore</label>
+                    <input type="number" id="inputValue" value="1" step="any" class="cartoon-input" oninput="convert()">
+                </div>
+                <div>
+                    <label class="label-style">Da</label>
+                    <select id="fromUnit" class="cartoon-select" onchange="convert()"></select>
+                </div>
+                <div>
+                    <label class="label-style">A</label>
+                    <select id="toUnit" class="cartoon-select" onchange="convert()"></select>
+                </div>
+            </div>
+
+            <button onclick="convert()" class="w-full btn-convert py-4">¡CALCOLA!</button>
+
+            <div id="resultArea">
+                <div class="result-box p-6 text-center">
+                    <p class="text-xs font-bold text-gray-500 mb-2 tracking-widest uppercase">Il Risultato è:</p>
+                    <div id="resultText" class="text-3xl font-black text-orange-600 break-all leading-tight"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-blue-50 p-3 text-center border-t-4 border-cartoon-border font-bold text-blue-800 text-xs">
+            🚀 Laboratorio di Fisica Digitale - PWA Ready
+        </div>
+    </div>
+
+    <script>
+        // Logica Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log('Service Worker Registrato!', reg))
+                    .catch(err => console.log('Errore SW:', err));
+            });
+        }
+
+        const measurementData = {
+            lunghezza: { label: "Lunghezza", icon: "📏", type: "base", units: [
+                { id: 'm', name: 'Metri', f: 1 }, { id: 'pm', name: 'Picometri', f: 1e-12 }, { id: 'nm', name: 'Nanometri', f: 1e-9 }, { id: 'um', name: 'Micrometri', f: 1e-6 }, { id: 'mm', name: 'Millimetri', f: 0.001 }, { id: 'cm', name: 'Centimetri', f: 0.01 }, { id: 'dm', name: 'Decimetri', f: 0.1 }, { id: 'km', name: 'Chilometri', f: 1000 }, { id: 'UA', name: 'Unità Astron.', f: 1.5e11 }, { id: 'ly', name: 'Anno Luce', f: 9.461e15 }, { id: 'pc', name: 'Parsec', f: 3.09e16 }
+            ]},
+            massa: { label: "Massa", icon: "⚖️", type: "base", units: [
+                { id: 'kg', name: 'Chilogrammi', f: 1 }, { id: 'g', name: 'Grammi', f: 0.001 }, { id: 'mg', name: 'Milligrammi', f: 1e-6 }, { id: 'ton', name: 'Tonnellata', f: 1000 }, { id: 'qt', name: 'Quintale', f: 100 }
+            ]},
+            tempo: { label: "Tempo", icon: "⏱️", type: "base", units: [
+                { id: 's', name: 'Secondi', f: 1 }, { id: 'ms', name: 'Millisecondi', f: 0.001 }, { id: 'min', name: 'Minuti', f: 60 }, { id: 'h', name: 'Ore', f: 3600 }, { id: 'd', name: 'Giorni', f: 86400 }
+            ]},
+            temperatura: { label: "Temperatura", icon: "🌡️", type: "base", isTemp: true, units: [
+                { id: 'K', name: 'Kelvin' }, { id: 'C', name: 'Celsius' }, { id: 'F', name: 'Fahrenheit' }
+            ]},
+            corrente: { label: "Corrente (A)", icon: "⚡", type: "base", units: [
+                { id: 'A', name: 'Ampere', f: 1 }, { id: 'mA', name: 'Milliampere', f: 0.001 }, { id: 'uA', name: 'Microampere', f: 1e-6 }
+            ]},
+            luminosita: { label: "Luminosità", icon: "🕯️", type: "base", units: [
+                { id: 'cd', name: 'Candela', f: 1 }
+            ]},
+            sostanza: { label: "Sostanza", icon: "🧪", type: "base", units: [
+                { id: 'mol', name: 'Mole', f: 1 }, { id: 'mmol', name: 'Millimole', f: 0.001 }
+            ]},
+            area: { label: "Area (m²)", type: "derived", units: [
+                { id: 'm2', name: 'Metri quadrati', f: 1 }, { id: 'cm2', name: 'cm quadrati', f: 0.0001 }, { id: 'ha', name: 'Ettaro', f: 10000 }
+            ]},
+            volume: { label: "Volume (m³)", type: "derived", units: [
+                { id: 'm3', name: 'Metri cubi', f: 1 }, { id: 'l', name: 'Litri', f: 0.001 }, { id: 'ml', name: 'Millilitri', f: 1e-6 }
+            ]},
+            velocita: { label: "Velocità (m/s)", type: "derived", units: [
+                { id: 'ms', name: 'm/s', f: 1 }, { id: 'kmh', name: 'km/h', f: 1/3.6 }
+            ]},
+            forza: { label: "Forza (N)", type: "derived", units: [
+                { id: 'N', name: 'Newton', f: 1 }, { id: 'kN', name: 'Kilonewton', f: 1000 }
+            ]},
+            pressione: { label: "Pressione (Pa)", type: "derived", units: [
+                { id: 'Pa', name: 'Pascal', f: 1 }, { id: 'bar', name: 'Bar', f: 100000 }, { id: 'atm', name: 'Atmosfera', f: 101325 }
+            ]},
+            energia: { label: "Energia (J)", type: "derived", units: [
+                { id: 'J', name: 'Joule', f: 1 }, { id: 'cal', name: 'Caloria', f: 4.184 }, { id: 'kWh', name: 'Kilowattora', f: 3.6e6 }
+            ]},
+            potenza: { label: "Potenza (W)", type: "derived", units: [
+                { id: 'W', name: 'Watt', f: 1 }, { id: 'kW', name: 'Kilowatt', f: 1000 }
+            ]},
+            frequenza: { label: "Frequenza (Hz)", type: "derived", units: [
+                { id: 'Hz', name: 'Hertz', f: 1 }, { id: 'kHz', name: 'Kilohertz', f: 1000 }, { id: 'MHz', name: 'Megahertz', f: 1e6 }
+            ]}
+        };
+
+        let currentCategory = 'lunghezza';
+
+        function init() {
+            const baseContainer = document.getElementById('baseCategoryContainer');
+            const derivedSelect = document.getElementById('derivedCategorySelector');
+            
+            Object.keys(measurementData).forEach(cat => {
+                const data = measurementData[cat];
+                if (data.type === "base") {
+                    const btn = document.createElement('button');
+                    btn.className = `category-btn ${cat === currentCategory ? 'active' : ''}`;
+                    btn.id = "btn-" + cat;
+                    btn.innerHTML = `<span class="text-xl">${data.icon}</span><span>${data.label}</span>`;
+                    btn.onclick = () => selectBase(cat);
+                    baseContainer.appendChild(btn);
+                } else {
+                    const opt = document.createElement('option');
+                    opt.value = cat;
+                    opt.innerText = data.label;
+                    derivedSelect.appendChild(opt);
+                }
+            });
+            updateSelects();
+        }
+
+        function selectBase(cat) {
+            document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('btn-' + cat).classList.add('active');
+            document.getElementById('derivedCategorySelector').selectedIndex = 0;
+            currentCategory = cat;
+            updateSelects();
+        }
+
+        function selectDerived(cat) {
+            document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+            currentCategory = cat;
+            updateSelects();
+        }
+
+        function updateSelects() {
+            const fromS = document.getElementById('fromUnit');
+            const toS = document.getElementById('toUnit');
+            fromS.innerHTML = "";
+            toS.innerHTML = "";
+            
+            measurementData[currentCategory].units.forEach(u => {
+                fromS.add(new Option(`${u.name} (${u.id})`, u.id));
+                toS.add(new Option(`${u.name} (${u.id})`, u.id));
+            });
+            
+            if (fromS.options.length > 1) toS.selectedIndex = 1;
+            convert();
+        }
+
+        function convert() {
+            const inputVal = parseFloat(document.getElementById('inputValue').value);
+            const fromId = document.getElementById('fromUnit').value;
+            const toId = document.getElementById('toUnit').value;
+            const resText = document.getElementById('resultText');
+
+            if (isNaN(inputVal)) {
+                resText.innerText = "---";
+                return;
+            }
+
+            const cat = measurementData[currentCategory];
+            let result;
+
+            if (cat.isTemp) {
+                let kelvin;
+                if (fromId === 'K') kelvin = inputVal;
+                else if (fromId === 'C') kelvin = inputVal + 273.15;
+                else if (fromId === 'F') kelvin = (inputVal - 32) * 5/9 + 273.15;
+
+                if (toId === 'K') result = kelvin;
+                else if (toId === 'C') result = kelvin - 273.15;
+                else if (toId === 'F') result = (kelvin - 273.15) * 9/5 + 32;
+            } else {
+                const fromU = cat.units.find(u => u.id === fromId);
+                const toU = cat.units.find(u => u.id === toId);
+                result = (inputVal * fromU.f) / toU.f;
+            }
+
+            let output = (Math.abs(result) < 1e-6 || Math.abs(result) > 1e9) 
+                ? result.toExponential(4) 
+                : parseFloat(result.toPrecision(8)).toString();
+
+            resText.innerText = `${output} ${toId}`;
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
